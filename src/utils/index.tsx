@@ -111,7 +111,7 @@ export const movePlayer = (dx: number, y: number) => {
     state.spawnPool = ['fox', 'fox']
   }
   if (state.spawnTimer === 0) {
-    state.spawnTimer = 10 + 5 * getScoreMulti()
+    state.spawnTimer = 10 + 1 * getScoreMulti()
     spawnEnemy(state.nextSpawn.key)
     state.nextSpawn = undefined
   }
@@ -139,13 +139,26 @@ function getCoordsInDistance(center: Coord, distance: number): Coord[] {
   return coords
 }
 
-const moveEnemies = () => {
-  const enemies = Object.values(state.entities).filter((e) => {
+const getEnemies = () =>
+  Object.values(state.entities).filter((e) => {
     const entityType = ENTITY_TYPES[e.type]
     return entityType.isDynamic && !entityType.isPlayer
   })
 
-  enemies.forEach((enemy) => moveEnemy(enemy.id))
+const consumeEnemies = () => {
+  const enemies = getEnemies()
+  enemies.forEach((a) => {
+    enemies.forEach((b) => {
+      if (a === b || !overlap(a, b)) return
+      if (!ENTITY_TYPES[a.type].targets?.includes(b.type)) return
+
+      removeEntity(b)
+    })
+  })
+}
+const moveEnemies = () => {
+  getEnemies().forEach((enemy) => moveEnemy(enemy.id))
+  setTimeout(() => consumeEnemies(), 100)
 }
 
 const moveEnemy = (id: string) => {
@@ -200,10 +213,6 @@ const moveEnemy = (id: string) => {
 
   if (!overlap(enemy, target)) {
     enemy.nextMove = getMoveDirection(enemy, target)
-  }
-
-  if (overlap(enemy, target)) {
-    setTimeout(() => removeEntity(target), 100)
   }
 }
 
