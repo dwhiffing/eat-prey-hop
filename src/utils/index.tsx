@@ -94,7 +94,8 @@ export const movePlayer = (dx: number, y: number) => {
   } else {
     const blacklist = Object.values(state.entities).map(coordToKey)
     if (state.nextSpawn) blacklist.push(coordToKey(state.nextSpawn.coords))
-    spawnEntity('carrot', getRandomPosition(state.gridSize, blacklist))
+    const pos = getRandomPosition(state.gridSize, blacklist)
+    if (pos) spawnEntity('carrot', pos)
   }
 
   moveEnemies()
@@ -106,27 +107,35 @@ export const movePlayer = (dx: number, y: number) => {
     const blacklist = [state.entities.carrot, ...nearRabbit]
       .filter(Boolean)
       .map(coordToKey)
-    state.nextSpawn = {
-      key: state.spawnPool.shift()!,
-      coords: getRandomPosition(state.gridSize, blacklist),
+    const pos = getRandomPosition(state.gridSize, blacklist)
+    if (pos) {
+      state.nextSpawn = {
+        key: state.spawnPool.shift()!,
+        coords: pos,
+      }
     }
   }
   if (state.spawnPool.length === 0) {
     state.spawnPool = ['fox', 'fox']
   }
-  if (state.spawnTimer === 0) {
+  if (state.spawnTimer === 0 && state.nextSpawn) {
     state.spawnTimer = 10 + 1 * getScoreMulti()
     spawnEnemy(state.nextSpawn.key)
     state.nextSpawn = undefined
   }
 }
 
-const getRandomPosition = (gridSize: number, blacklist: string[]): Coord => {
+const getRandomPosition = (
+  gridSize: number,
+  blacklist: string[],
+): Coord | undefined => {
   let x, y, key
+  let max = 99
   do {
     x = Math.floor(Math.random() * gridSize)
     y = Math.floor(Math.random() * gridSize)
     key = `${x},${y}`
+    if (max-- <= 0) return undefined
   } while (blacklist.includes(key))
   return { x, y }
 }
