@@ -75,10 +75,9 @@ export const movePlayer = (dx: number, y: number) => {
       removeEntity(carrot)
     }
   } else {
-    spawnEntity(
-      'carrot',
-      getRandomPosition(gridSize, [coordToKey(state.entities.rabbit)]),
-    )
+    const blacklist = Object.values(state.entities).map(coordToKey)
+    if (state.nextSpawn) blacklist.push(coordToKey(state.nextSpawn.coords))
+    spawnEntity('carrot', getRandomPosition(gridSize, blacklist))
   }
 
   moveEnemies()
