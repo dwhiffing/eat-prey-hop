@@ -43,11 +43,7 @@ const spawnEntity = (type: EntityTypeKey, position: Coord) => {
 }
 
 const spawnEnemy = (key: EntityTypeKey) => {
-  const nearRabbit = getCoordsInRadius(state.entities.rabbit, 2)
-  const blacklist = [state.entities.carrot, ...nearRabbit]
-    .filter(Boolean)
-    .map(coordToKey)
-  spawnEntity(key, getRandomPosition(gridSize, blacklist))
+  if (state.nextSpawn) spawnEntity(key, state.nextSpawn.coords)
 }
 
 const removeEntity = (entity: Entity) => {
@@ -78,13 +74,24 @@ export const movePlayer = (dx: number, y: number) => {
   moveEnemies()
 
   state.spawnTimer--
+
+  if (!state.nextSpawn) {
+    const nearRabbit = getCoordsInDistance(state.entities.rabbit, 2)
+    const blacklist = [state.entities.carrot, ...nearRabbit]
+      .filter(Boolean)
+      .map(coordToKey)
+    state.nextSpawn = {
+      key: state.spawnPool.shift()!,
+      coords: getRandomPosition(gridSize, blacklist),
+    }
+  }
+  if (state.spawnPool.length === 0) {
+    state.spawnPool = ['fox', 'fox']
+  }
   if (state.spawnTimer === 0) {
     state.spawnTimer = 10 + 5 * getScoreMulti()
-    if (state.spawnPool.length === 0) {
-      state.spawnPool = ['fox', 'fox']
-    }
-    const key = state.spawnPool.shift()!
-    spawnEnemy(key)
+    spawnEnemy(state.nextSpawn.key)
+    state.nextSpawn = undefined
   }
 }
 
@@ -97,14 +104,13 @@ const getRandomPosition = (gridSize: number, blacklist: string[]): Coord => {
   } while (blacklist.includes(key))
   return { x, y }
 }
-function getCoordsInRadius(center: Coord, radius: number): Coord[] {
+
+function getCoordsInDistance(center: Coord, distance: number): Coord[] {
   const coords: Coord[] = []
 
-  for (let dx = -radius; dx <= radius; dx++) {
-    for (let dy = -radius; dy <= radius; dy++) {
-      if (dx * dx + dy * dy <= radius * radius) {
-        coords.push({ x: center.x + dx, y: center.y + dy })
-      }
+  for (let dx = -distance; dx <= distance; dx++) {
+    for (let dy = -distance; dy <= distance; dy++) {
+      coords.push({ x: center.x + dx, y: center.y + dy })
     }
   }
 
@@ -122,24 +128,50 @@ const moveEnemies = () => {
 
 const moveEnemy = (id: string) => {
   const enemy = state.entities[id]
-  const { targets, speed } = ENTITY_TYPES[enemy.type]
+  const { targets, speed, activeSightRange, inactiveSightRange } =
+    ENTITY_TYPES[enemy.type]
 
   if (!targets) return
 
-  const target = Object.values(state.entities)
-    .filter((e) => targets.includes(e.type))
-    .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))[0]
-
-  if (!target) return
+  const activeCoords = getCoordsInDistance(enemy, activeSightRange ?? 0).map(
+    coordToKey,
+  )
+  const inactiveCoords = getCoordsInDistance(
+    enemy,
+    inactiveSightRange ?? 0,
+  ).map(coordToKey)
 
   enemy.pace = enemy.pace ?? 0
   enemy.pace++
-  if (enemy.pace === speed) {
+
+  // TODO: entity should switch to best target in its inactive sight range, tiebreaking to currently active target rather than switching
+  if (!enemy.activeTargetId) {
+    const target = Object.values(state.entities)
+      .filter(
+        (e) =>
+          targets.includes(e.type) && inactiveCoords.includes(coordToKey(e)),
+      )
+      .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))[0]
+    if (target) enemy.activeTargetId = target.id
+  }
+
+  if (!enemy.activeTargetId) return
+
+  const target = state.entities[enemy.activeTargetId]
+  if (!target || !activeCoords.includes(coordToKey(target))) {
+    enemy.activeTargetId = undefined
+    enemy.nextMove = undefined
+    return
+  }
+
+  if (enemy.pace >= (speed ?? 0)) {
+    if (enemy.nextMove) moveEntity(id, enemy.nextMove.x, enemy.nextMove.y)
+    enemy.nextMove = undefined
     enemy.pace = 0
-    if (!overlap(enemy, target)) {
-      const dir = getMoveDirection(enemy, target)
-      if (dir) moveEntity(id, dir.x, dir.y)
-    }
+  }
+
+  if (!overlap(enemy, target)) {
+    enemy.nextMove = getMoveDirection(enemy, target)
   }
 
   if (overlap(enemy, target)) {
@@ -181,3 +213,17 @@ const getMoveDirection = (src: Entity, dest: Entity, allowDiagonals = true) => {
 
   return options[0].change
 }
+
+// function getCoordsInRadius(center: Coord, radius: number): Coord[] {
+//   const coords: Coord[] = []
+
+//   for (let dx = -radius; dx <= radius; dx++) {
+//     for (let dy = -radius; dy <= radius; dy++) {
+//       if (dx * dx + dy * dy <= radius * radius) {
+//         coords.push({ x: center.x + dx, y: center.y + dy })
+//       }
+//     }
+//   }
+
+//   return coords
+// }

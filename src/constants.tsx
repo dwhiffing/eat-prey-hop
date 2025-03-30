@@ -2,6 +2,7 @@ import { EntityType } from './types'
 
 export const gridSize = 9
 export const maxWidth = 900
+export const DEBUG = true
 
 export const ENTITY_TYPES: Record<string, EntityType> = {
   rabbit: {
@@ -22,6 +23,8 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isDynamic: true,
     isPlayer: false,
     speed: 2,
+    activeSightRange: 4,
+    inactiveSightRange: 2,
     targets: ['rabbit'],
     passable: ['bush'],
   },
@@ -30,6 +33,8 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isDynamic: true,
     isPlayer: false,
     speed: 3,
+    activeSightRange: 4,
+    inactiveSightRange: 3,
     targets: ['fox', 'rabbit'],
   },
   lion: {
@@ -37,6 +42,8 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isDynamic: true,
     isPlayer: false,
     speed: 5,
+    activeSightRange: 3,
+    inactiveSightRange: 3,
     targets: ['wolf', 'fox', 'rabbit'],
   },
   bear: {
@@ -44,6 +51,8 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isDynamic: true,
     isPlayer: false,
     speed: 7,
+    activeSightRange: 3,
+    inactiveSightRange: 2,
     targets: ['lion', 'rabbit'],
   },
   rock: {

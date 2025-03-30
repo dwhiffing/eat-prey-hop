@@ -17,12 +17,16 @@ export interface Entity {
   x: number
   y: number
   pace?: number
+  activeTargetId?: string
+  nextMove?: Coord
 }
 export interface EntityType {
   image: EntityTypeKey
   isDynamic: boolean
   isPlayer: boolean
   speed?: number
+  activeSightRange?: number
+  inactiveSightRange?: number
   targets?: EntityTypeKey[]
   passable?: EntityTypeKey[]
 }

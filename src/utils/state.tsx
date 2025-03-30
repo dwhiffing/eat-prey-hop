@@ -1,16 +1,18 @@
 import { proxy } from 'valtio'
 import { gridSize } from '../constants'
-import { Entity, EntityTypeKey } from '../types'
+import { Coord, Entity, EntityTypeKey } from '../types'
 
 export const state = proxy<{
   score: number
   spawnTimer: number
+  nextSpawn?: { key: EntityTypeKey; coords: Coord }
   spawnPool: EntityTypeKey[]
   entities: Record<string, Entity>
 }>({
   score: 0,
   spawnTimer: 10,
   spawnPool: ['fox', 'wolf'],
+  nextSpawn: undefined,
   entities: {
     rabbit: {
       id: 'rabbit',
