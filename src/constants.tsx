@@ -1,7 +1,7 @@
 import { EntityType, EntityTypeKey } from './types'
 
 export const DEBUG = false
-export const initialGridSize = 5
+export const initialGridSize = 3
 export const maxWidth = 900
 export const SCORE_FOR_GRID_SIZE_INCREASE = 100
 export const SAVE_KEY = 'eat-prey-hop-highscore'

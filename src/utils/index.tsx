@@ -82,12 +82,36 @@ export const movePlayer = (dx: number, y: number) => {
     if (overlap(state.entities.rabbit, carrot)) {
       state.score += 10 * getScoreMulti()
       const m = 1 + (state.gridSize - initialGridSize) / 2
-      if (state.score >= m * SCORE_FOR_GRID_SIZE_INCREASE) {
+      if (
+        state.score >= m * SCORE_FOR_GRID_SIZE_INCREASE &&
+        state.gridSize < 17
+      ) {
         state.gridSize = initialGridSize + m * 2
         Object.values(state.entities).forEach((e) => {
           e.x += 1
           e.y += 1
         })
+        if (state.nextSpawn) {
+          state.nextSpawn.coords.x += 1
+          state.nextSpawn.coords.y += 1
+        }
+        getOuterRing(state.gridSize).map((c) =>
+          Math.random() > 0.33
+            ? undefined
+            : spawnEntity(
+                pick([
+                  'bush',
+                  'bush',
+                  'bush',
+                  'bush',
+                  'bush',
+                  'bush',
+                  'tree',
+                  'rock',
+                ]) as EntityTypeKey,
+                c,
+              ),
+        )
       }
       removeEntity(carrot)
     }
@@ -104,7 +128,7 @@ export const movePlayer = (dx: number, y: number) => {
 
   if (!state.nextSpawn) {
     const nearRabbit = getCoordsInDistance(state.entities.rabbit, 2)
-    const blacklist = [state.entities.carrot, ...nearRabbit]
+    const blacklist = [...Object.values(state.entities), ...nearRabbit]
       .filter(Boolean)
       .map(coordToKey)
     const pos = getRandomPosition(state.gridSize, blacklist)
@@ -299,6 +323,23 @@ const getMoveDirection = (
     })
 
   return options[0].change
+}
+
+const getOuterRing = (x: number): Coord[] => {
+  if (x <= 1) return [{ x: 0, y: 0 }]
+
+  const coordinates: Coord[] = []
+  for (let col = 0; col < x; col++) coordinates.push({ x: 0, y: col })
+  for (let row = 1; row < x; row++) coordinates.push({ x: row, y: x - 1 })
+  for (let col = x - 2; col >= 0; col--) coordinates.push({ x: x - 1, y: col })
+  for (let row = x - 2; row > 0; row--) coordinates.push({ x: row, y: 0 })
+
+  return coordinates
+}
+
+function pick<T>(array: T[]): T | undefined {
+  if (array.length === 0) return undefined
+  return array[Math.floor(Math.random() * array.length)]
 }
 
 // function getCoordsInRadius(center: Coord, radius: number): Coord[] {

@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import { useElementSize } from '../hooks/useElementSize'
 import { Entity } from '../types'
 import { state } from '../utils/state'
-import { Animal } from './Animal'
+import { Animal, IdAnimal } from './Animal'
 
 export const Grid: React.FC<{
   gridSize: number
@@ -14,6 +14,10 @@ export const Grid: React.FC<{
   const cellSize = size.width / gridSize
   const gridTemplateColumns = `repeat(${gridSize}, minmax(0, 1fr))`
   const cells = useMemo(() => [...Array(gridSize * gridSize)], [gridSize])
+  const renderedEntities = useMemo(
+    () => (cellSize > 0 ? Object.keys(entities) : []),
+    [cellSize, entities],
+  )
 
   return (
     <div
@@ -36,15 +40,14 @@ export const Grid: React.FC<{
             }}
           />
         )}
-        {cellSize > 0 &&
-          Object.values(entities).map((entity) => (
-            <Animal
-              key={entity.id}
-              size={cellSize}
-              entity={entity}
-              opacity={1}
-            />
-          ))}
+        {renderedEntities.map((entityId) => (
+          <IdAnimal
+            key={entityId}
+            size={cellSize}
+            entityId={entityId}
+            opacity={1}
+          />
+        ))}
       </AnimatePresence>
     </div>
   )

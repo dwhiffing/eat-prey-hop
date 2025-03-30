@@ -1,8 +1,28 @@
 import { motion } from 'motion/react'
-import React from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { Entity } from '../types'
 import { DEBUG, ENTITY_TYPES } from '../constants'
 import { state } from '../utils/state'
+import { subscribe } from 'valtio'
+
+export const IdAnimal = memo(
+  (props: { size: number; entityId: string; opacity: number }) => {
+    const entity = state.entities[props.entityId]
+    const [, setDate] = useState(0)
+
+    useEffect(
+      () =>
+        subscribe(state.entities[props.entityId], () => setDate(Date.now())),
+      [props.entityId],
+    )
+
+    return (
+      entity && (
+        <Animal size={props.size} entity={entity} opacity={props.opacity} />
+      )
+    )
+  },
+)
 
 export const Animal = (props: {
   size: number
