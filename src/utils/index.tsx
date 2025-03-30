@@ -140,7 +140,9 @@ export const movePlayer = (dx: number, y: number) => {
     }
   }
   if (state.spawnPool.length === 0) {
-    state.spawnPool = ['fox', 'fox']
+    // prettier-ignore
+    // 90% fox
+    state.spawnPool = shuffle(['fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'wolf'])
   }
   if (state.spawnTimer === 0 && state.nextSpawn) {
     state.spawnTimer = 10 + 1 * getScoreMulti()
@@ -340,6 +342,15 @@ const getOuterRing = (x: number): Coord[] => {
 function pick<T>(array: T[]): T | undefined {
   if (array.length === 0) return undefined
   return array[Math.floor(Math.random() * array.length)]
+}
+
+function shuffle<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
 }
 
 // function getCoordsInRadius(center: Coord, radius: number): Coord[] {
