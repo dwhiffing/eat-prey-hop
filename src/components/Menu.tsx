@@ -13,7 +13,7 @@ export function Menu() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-6">
-      <p className="text-white text-2xl font-bold">Menu</p>
+      <p className="text-white text-2xl font-bold">Eat, Prey, Hop</p>
       {snap.highScore > 0 && (
         <p className="text-white italic">High Score: {snap.highScore}</p>
       )}

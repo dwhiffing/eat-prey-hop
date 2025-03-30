@@ -1,10 +1,10 @@
 import { EntityType, EntityTypeKey } from './types'
 
+export const DEBUG = false
 export const initialGridSize = 5
 export const maxWidth = 900
 export const SCORE_FOR_GRID_SIZE_INCREASE = 100
-export const DEBUG = true
-export const SAVE_KEY = 'rabbit-game-highscore'
+export const SAVE_KEY = 'eat-prey-hop-highscore'
 export const INITIAL_STATE = {
   gameOver: true,
   score: 0,
