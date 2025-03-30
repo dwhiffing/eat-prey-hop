@@ -81,9 +81,13 @@ export const movePlayer = (dx: number, y: number) => {
   if (carrot) {
     if (overlap(state.entities.rabbit, carrot)) {
       state.score += 10 * getScoreMulti()
-      const m = 1 + (state.gridSize - initialGridSize)
+      const m = 1 + (state.gridSize - initialGridSize) / 2
       if (state.score >= m * SCORE_FOR_GRID_SIZE_INCREASE) {
-        state.gridSize = initialGridSize + m
+        state.gridSize = initialGridSize + m * 2
+        Object.values(state.entities).forEach((e) => {
+          e.x += 1
+          e.y += 1
+        })
       }
       removeEntity(carrot)
     }
