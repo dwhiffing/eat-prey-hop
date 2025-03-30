@@ -4,12 +4,23 @@ import { state } from './state'
 
 const overlap = (a: Coord, b: Coord) => a.x === b.x && a.y === b.y
 
+const getPassable = (a: Entity, b: Entity) => {
+  const { targets, passable } = ENTITY_TYPES[a.type]
+  return targets?.includes(b.type) || passable?.includes(b.type)
+}
+
 const moveEntity = (id: string, x: number, y: number) => {
   const entity = state.entities[id]
   if (!entity) return
 
-  entity.x = Math.min(gridSize - 1, Math.max(0, entity.x + x))
-  entity.y = Math.min(gridSize - 1, Math.max(0, entity.y + y))
+  const newX = Math.min(gridSize - 1, Math.max(0, entity.x + x))
+  const newY = Math.min(gridSize - 1, Math.max(0, entity.y + y))
+  const dest = Object.values(state.entities).find((e) =>
+    overlap({ x: newX, y: newY }, e),
+  )
+  if (dest && !getPassable(entity, dest)) return
+  entity.x = newX
+  entity.y = newY
 }
 
 export const getScoreMulti = () => {
@@ -157,7 +168,7 @@ const getMoveDirection = (src: Entity, dest: Entity, allowDiagonals = true) => {
   }
 
   const unpassable = Object.values(state.entities)
-    .filter((e) => !ENTITY_TYPES[src.type].targets?.includes(e.type))
+    .filter((e) => !getPassable(src, e))
     .map(coordToKey)
   options = options
     .filter((o) => !unpassable.includes(coordToKey(o.coord)))

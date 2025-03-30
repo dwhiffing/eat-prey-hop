@@ -6,9 +6,10 @@ export type EntityTypeKey =
   | 'hole'
   | 'lion'
   | 'rabbit'
-  | 'rock'
   | 'snake'
+  | 'rock'
   | 'tree'
+  | 'bush'
   | 'wolf'
 export interface Entity {
   id: string
@@ -23,6 +24,7 @@ export interface EntityType {
   isPlayer: boolean
   speed?: number
   targets?: EntityTypeKey[]
+  passable?: EntityTypeKey[]
 }
 
 export type Coord = { x: number; y: number }

@@ -9,7 +9,8 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isDynamic: true,
     isPlayer: true,
     speed: 1,
-    targets: [],
+    targets: ['carrot'],
+    passable: ['bush'],
   },
   carrot: {
     image: 'carrot',
@@ -22,6 +23,7 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isPlayer: false,
     speed: 2,
     targets: ['rabbit'],
+    passable: ['bush'],
   },
   wolf: {
     image: 'wolf',
@@ -46,6 +48,16 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
   },
   rock: {
     image: 'rock',
+    isDynamic: false,
+    isPlayer: false,
+  },
+  tree: {
+    image: 'tree',
+    isDynamic: false,
+    isPlayer: false,
+  },
+  bush: {
+    image: 'bush',
     isDynamic: false,
     isPlayer: false,
   },
