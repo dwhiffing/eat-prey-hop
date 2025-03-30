@@ -31,6 +31,9 @@ const moveEnemies = () => {
 const moveEnemy = (id: string) => {
   const enemy = state.entities[id]
   const { targets, speed } = ENTITY_TYPES[enemy.type]
+
+  if (!targets) return
+
   const target = Object.values(state.entities)
     .filter((e) => targets.includes(e.type))
     .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))[0]
@@ -100,7 +103,7 @@ const getMoveDirection = (
   const unpassable = Object.values(state.entities)
     .filter((e) => {
       const t = ENTITY_TYPES[current.type]
-      return !t.targets.includes(e.type)
+      return !t.targets?.includes(e.type)
     })
     .map((e) => coordToKey({ x: e.x, y: e.y }))
   for (const option of options) {

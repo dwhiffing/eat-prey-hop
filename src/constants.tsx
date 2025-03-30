@@ -46,4 +46,9 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     speed: 7,
     targets: ['lion', 'rabbit'],
   },
+  rock: {
+    image: 'rock',
+    isDynamic: false,
+    isPlayer: false,
+  },
 }

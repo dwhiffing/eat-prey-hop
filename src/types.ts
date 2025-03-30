@@ -21,8 +21,8 @@ export interface EntityType {
   image: EntityTypeKey
   isDynamic: boolean
   isPlayer: boolean
-  speed: number
-  targets: EntityTypeKey[]
+  speed?: number
+  targets?: EntityTypeKey[]
 }
 
 export type Coord = { x: number; y: number }
