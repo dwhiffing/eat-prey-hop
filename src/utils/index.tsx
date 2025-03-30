@@ -1,4 +1,4 @@
-import { ENTITY_TYPES, gridSize } from '../constants'
+import { ENTITY_TYPES, gridSize, INITIAL_STATE, SAVE_KEY } from '../constants'
 import { Coord, Entity, EntityTypeKey } from '../types'
 import { state } from './state'
 
@@ -27,7 +27,7 @@ export const getScoreMulti = () => {
   const bears = getEntitiesByType('bear').length * 16
   const lions = getEntitiesByType('lion').length * 8
   const wolves = getEntitiesByType('wolf').length * 4
-  const foxes = Math.min(getEntitiesByType('fox').length * 2)
+  const foxes = Math.max(getEntitiesByType('fox').length * 2, 1)
   return bears + lions + wolves + foxes
 }
 
@@ -48,6 +48,16 @@ const spawnEnemy = (key: EntityTypeKey) => {
 
 const removeEntity = (entity: Entity) => {
   delete state.entities[entity.id]
+  if (entity.id === 'rabbit') {
+    setTimeout(() => {
+      const { score, highScore } = state
+      Object.assign(state, JSON.parse(JSON.stringify(INITIAL_STATE)))
+      state.highScore = highScore
+      if (score > highScore) {
+        localStorage.setItem(SAVE_KEY, `${state.highScore}`)
+      }
+    }, 1000)
+  }
 }
 
 const getEntitiesByType = (type: EntityTypeKey) =>
