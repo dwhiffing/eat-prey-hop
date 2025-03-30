@@ -146,9 +146,12 @@ const getEnemies = () =>
   })
 
 const consumeEnemies = () => {
-  const enemies = getEnemies()
-  enemies.forEach((a) => {
-    enemies.forEach((b) => {
+  const entities = Object.values(state.entities).filter((e) => {
+    const entityType = ENTITY_TYPES[e.type]
+    return entityType.isDynamic
+  })
+  entities.forEach((a) => {
+    entities.forEach((b) => {
       if (a === b || !overlap(a, b)) return
       if (!ENTITY_TYPES[a.type].targets?.includes(b.type)) return
 
@@ -179,12 +182,12 @@ const moveEnemy = (id: string) => {
   enemy.pace = enemy.pace ?? 0
   enemy.pace++
 
+  // check active target, change to better target if possible
   const possibleTargets = Object.values(state.entities)
     .filter(
       (e) => targets.includes(e.type) && inactiveCoords.includes(coordToKey(e)),
     )
     .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))
-
   const activeTarget = state.entities[enemy.activeTargetId ?? '']
   if (
     !activeTarget ||
@@ -196,28 +199,41 @@ const moveEnemy = (id: string) => {
     if (target) enemy.activeTargetId = target.id
   }
 
-  if (!enemy.activeTargetId) return
-
-  const target = state.entities[enemy.activeTargetId]
-  if (!target || !activeCoords.includes(coordToKey(target))) {
+  // lose target if they are too far away
+  const target = state.entities[enemy.activeTargetId ?? '']
+  if (target && !activeCoords.includes(coordToKey(target))) {
     enemy.activeTargetId = undefined
     enemy.nextMove = undefined
-    return
   }
 
+  // if we are ready to move and we have somewhere to move, move
   if (enemy.pace >= (speed ?? 0)) {
     if (enemy.nextMove) moveEntity(id, enemy.nextMove.x, enemy.nextMove.y)
     enemy.nextMove = undefined
     enemy.pace = 0
   }
 
-  if (!overlap(enemy, target)) {
-    enemy.nextMove = getMoveDirection(enemy, target)
+  if (!enemy.nextMove) {
+    // determine next move if we dont have one
+    // if we are currently a target of something, run away from that instead of toward prey
+    const predator = Object.values(state.entities).find(
+      (e) => e.activeTargetId === id,
+    )
+    if (predator) {
+      enemy.nextMove = getMoveDirection(enemy, predator, true, true)
+    } else if (target && !overlap(enemy, target)) {
+      enemy.nextMove = getMoveDirection(enemy, target, true, false)
+    }
   }
 }
 
 const coordToKey = (coord: Partial<Coord>) => `${coord.x},${coord.y}`
-const getMoveDirection = (src: Entity, dest: Entity, allowDiagonals = true) => {
+const getMoveDirection = (
+  src: Entity,
+  dest: Entity,
+  allowDiagonals = true,
+  invert = false,
+) => {
   if (!src || !dest) return { x: 0, y: 0 }
 
   let options: { change: Coord; coord: Coord }[] = [
@@ -241,12 +257,19 @@ const getMoveDirection = (src: Entity, dest: Entity, allowDiagonals = true) => {
     .map(coordToKey)
   options = options
     .filter((o) => !unpassable.includes(coordToKey(o.coord)))
-    .sort(
-      (a, b) =>
+    .filter(
+      ({ coord: b }) =>
+        b.x >= 0 && b.y >= 0 && b.x < state.gridSize && b.y < state.gridSize,
+    )
+    .sort((_a, _b) => {
+      const a = invert ? _b : _a
+      const b = invert ? _a : _b
+      return (
         Math.abs(a.coord.x - dest.x) +
         Math.abs(a.coord.y - dest.y) -
-        (Math.abs(b.coord.x - dest.x) + Math.abs(b.coord.y - dest.y)),
-    )
+        (Math.abs(b.coord.x - dest.x) + Math.abs(b.coord.y - dest.y))
+      )
+    })
 
   return options[0].change
 }
