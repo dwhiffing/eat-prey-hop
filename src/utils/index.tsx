@@ -57,60 +57,37 @@ const moveEnemy = (id: string) => {
   }
 }
 
-const getMoveDirection = (
-  current: Entity,
-  target: Entity,
-  allowDiagonals = true,
-) => {
-  if (!current || !target) return { x: 0, y: 0 }
-  const coordToKey = (coord: Coord) => `${coord.x},${coord.y}`
+const coordToKey = (coord: Partial<Coord>) => `${coord.x},${coord.y}`
+const getMoveDirection = (src: Entity, dest: Entity, allowDiagonals = true) => {
+  if (!src || !dest) return { x: 0, y: 0 }
 
-  const options: { change: Coord; coord: Coord }[] = [
-    { change: { x: 1, y: 0 }, coord: { x: current.x + 1, y: current.y } },
-    { change: { x: -1, y: 0 }, coord: { x: current.x - 1, y: current.y } },
-    { change: { x: 0, y: 1 }, coord: { x: current.x, y: current.y + 1 } },
-    { change: { x: 0, y: -1 }, coord: { x: current.x, y: current.y - 1 } },
+  let options: { change: Coord; coord: Coord }[] = [
+    { change: { x: 1, y: 0 }, coord: { x: src.x + 1, y: src.y } },
+    { change: { x: -1, y: 0 }, coord: { x: src.x - 1, y: src.y } },
+    { change: { x: 0, y: 1 }, coord: { x: src.x, y: src.y + 1 } },
+    { change: { x: 0, y: -1 }, coord: { x: src.x, y: src.y - 1 } },
   ]
 
   if (allowDiagonals) {
     options.push(
-      {
-        change: { x: 1, y: 1 },
-        coord: { x: current.x + 1, y: current.y + 1 },
-      },
-      {
-        change: { x: 1, y: -1 },
-        coord: { x: current.x + 1, y: current.y - 1 },
-      },
-      {
-        change: { x: -1, y: 1 },
-        coord: { x: current.x - 1, y: current.y + 1 },
-      },
-      {
-        change: { x: -1, y: -1 },
-        coord: { x: current.x - 1, y: current.y - 1 },
-      },
+      { change: { x: 1, y: 1 }, coord: { x: src.x + 1, y: src.y + 1 } },
+      { change: { x: 1, y: -1 }, coord: { x: src.x + 1, y: src.y - 1 } },
+      { change: { x: -1, y: 1 }, coord: { x: src.x - 1, y: src.y + 1 } },
+      { change: { x: -1, y: -1 }, coord: { x: src.x - 1, y: src.y - 1 } },
     )
   }
 
-  options.sort(
-    (a, b) =>
-      Math.abs(a.coord.x - target.x) +
-      Math.abs(a.coord.y - target.y) -
-      (Math.abs(b.coord.x - target.x) + Math.abs(b.coord.y - target.y)),
-  )
-
   const unpassable = Object.values(state.entities)
-    .filter((e) => {
-      const t = ENTITY_TYPES[current.type]
-      return !t.targets?.includes(e.type)
-    })
-    .map((e) => coordToKey({ x: e.x, y: e.y }))
-  for (const option of options) {
-    if (!unpassable.includes(coordToKey(option.coord))) {
-      return option.change
-    }
-  }
+    .filter((e) => !ENTITY_TYPES[src.type].targets?.includes(e.type))
+    .map(coordToKey)
+  options = options
+    .filter((o) => !unpassable.includes(coordToKey(o.coord)))
+    .sort(
+      (a, b) =>
+        Math.abs(a.coord.x - dest.x) +
+        Math.abs(a.coord.y - dest.y) -
+        (Math.abs(b.coord.x - dest.x) + Math.abs(b.coord.y - dest.y)),
+    )
 
-  return null
+  return options[0].change
 }
