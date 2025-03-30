@@ -17,6 +17,7 @@ export interface Entity {
   x: number
   y: number
   pace?: number
+  food?: number
   activeTargetId?: string
   nextMove?: Coord
 }
@@ -25,6 +26,9 @@ export interface EntityType {
   isDynamic: boolean
   isPlayer: boolean
   speed?: number
+  food?: number
+  evolveType?: EntityTypeKey
+  maxFood?: number
   activeSightRange?: number
   inactiveSightRange?: number
   targets?: EntityTypeKey[]

@@ -146,16 +146,30 @@ const getEnemies = () =>
   })
 
 const consumeEnemies = () => {
-  const entities = Object.values(state.entities).filter((e) => {
-    const entityType = ENTITY_TYPES[e.type]
-    return entityType.isDynamic
-  })
-  entities.forEach((a) => {
-    entities.forEach((b) => {
-      if (a === b || !overlap(a, b)) return
-      if (!ENTITY_TYPES[a.type].targets?.includes(b.type)) return
+  const entities = Object.values(state.entities).filter(
+    (e) => ENTITY_TYPES[e.type].isDynamic,
+  )
+  entities.forEach((pred) => {
+    entities.forEach((prey) => {
+      if (pred === prey || !overlap(pred, prey)) return
 
-      removeEntity(b)
+      const { food: preyFoodValue } = ENTITY_TYPES[prey.type]
+      const {
+        targets: predTargets,
+        maxFood: requiredPredFood,
+        evolveType,
+      } = ENTITY_TYPES[pred.type]
+      if (!predTargets?.includes(prey.type)) return
+
+      pred.food ??= 0
+      pred.food += preyFoodValue ?? 1
+
+      if (pred.food >= (requiredPredFood ?? 1) && evolveType) {
+        pred.type = evolveType
+        pred.food = 0
+      }
+
+      removeEntity(prey)
     })
   })
 }
