@@ -1,4 +1,4 @@
-type EntityTypeKey =
+export type EntityTypeKey =
   | 'bear'
   | 'carrot'
   | 'eagle'

@@ -28,15 +28,16 @@ export const Grid: React.FC<{
         {cellSize > 0 &&
           Object.values(entities).map((entity) => {
             const entityType = ENTITY_TYPES[entity.type]
+            const { x, y } = entity
 
             return (
               <motion.div
                 key={entity.id}
-                initial={false}
                 className="absolute flex justify-center items-center"
                 style={{ width: cellSize, height: cellSize }}
-                animate={{ x: entity.x * cellSize, y: entity.y * cellSize }}
                 exit={{ opacity: 0 }}
+                animate={{ x: x * cellSize, y: y * cellSize, opacity: 1 }}
+                initial={{ x: x * cellSize, y: y * cellSize, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 25 }}
               >
                 <img

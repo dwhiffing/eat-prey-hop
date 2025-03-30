@@ -3,7 +3,7 @@ import { useSnapshot } from 'valtio'
 import { gridSize, maxWidth } from '../constants'
 import { Grid } from './Grid'
 import { state } from '../utils/state'
-import { movePlayer } from '../utils'
+import { getScoreMulti, movePlayer } from '../utils'
 
 function App() {
   const snap = useSnapshot(state)
@@ -23,8 +23,11 @@ function App() {
   }, [])
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
+    <div className="flex flex-col gap-2 items-center justify-center w-full h-full">
       <Grid gridSize={gridSize} maxWidth={maxWidth} entities={snap.entities} />
+      <p className="text-white">Score: {snap.score}</p>
+      <p className="text-white">Multi: {getScoreMulti()}</p>
+      <p className="text-white">Spawn: {snap.spawnTimer}</p>
     </div>
   )
 }
