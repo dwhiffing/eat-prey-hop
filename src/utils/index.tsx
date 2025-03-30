@@ -1,9 +1,9 @@
 import {
   ENTITY_TYPES,
+  EXPAND_POINTS,
   INITIAL_STATE,
   initialGridSize,
   SAVE_KEY,
-  SCORE_FOR_GRID_SIZE_INCREASE,
 } from '../constants'
 import { Coord, Entity, EntityTypeKey } from '../types'
 import { state } from './state'
@@ -82,10 +82,7 @@ export const movePlayer = (dx: number, y: number) => {
     if (overlap(state.entities.rabbit, carrot)) {
       state.score += 10 * getScoreMulti()
       const m = 1 + (state.gridSize - initialGridSize) / 2
-      if (
-        state.score >= m * SCORE_FOR_GRID_SIZE_INCREASE &&
-        state.gridSize < 17
-      ) {
+      if (state.score >= EXPAND_POINTS[m - 1] && state.gridSize < 17) {
         state.gridSize = initialGridSize + m * 2
         Object.values(state.entities).forEach((e) => {
           e.x += 1
@@ -224,16 +221,31 @@ const moveEnemy = (id: string) => {
 
   if (!targets) return
 
-  const activeCoords = getCoordsInDistance(enemy, activeSightRange ?? 0).map(
-    coordToKey,
-  )
-  const inactiveCoords = getCoordsInDistance(
-    enemy,
-    inactiveSightRange ?? 0,
-  ).map(coordToKey)
-
   enemy.pace = enemy.pace ?? 0
   enemy.pace++
+
+  const excludeBush = (e: Coord) =>
+    !Object.values(state.entities).some(
+      (b) => b.type === 'bush' && e.x === b.x && e.y == b.y,
+    )
+
+  const activeCoords = getCoordsInDistance(enemy, activeSightRange ?? 0)
+    .filter(excludeBush)
+    .map(coordToKey)
+  const inactiveCoords = getCoordsInDistance(enemy, inactiveSightRange ?? 0)
+    .filter(excludeBush)
+    .map(coordToKey)
+  // if target is hidden in bush, lose target
+  const _activeTarget = state.entities[enemy.activeTargetId ?? '']
+  if (
+    _activeTarget &&
+    !activeCoords.some((c) => {
+      const [x, y] = c.split(',').map(Number)
+      return x === _activeTarget.x && y === _activeTarget.y
+    })
+  ) {
+    enemy.activeTargetId = undefined
+  }
 
   // check active target, change to better target if possible
   const possibleTargets = Object.values(state.entities)

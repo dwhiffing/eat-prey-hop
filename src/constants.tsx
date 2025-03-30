@@ -3,7 +3,10 @@ import { EntityType, EntityTypeKey } from './types'
 export const DEBUG = false
 export const initialGridSize = 3
 export const maxWidth = 900
-export const SCORE_FOR_GRID_SIZE_INCREASE = 100
+export const EXPAND_POINTS = [
+  10, 100, 250, 500, 1000, 5000, 10000, 50000, 100000,
+]
+
 export const SAVE_KEY = 'eat-prey-hop-highscore'
 export const INITIAL_STATE = {
   gameOver: true,
