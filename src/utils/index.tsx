@@ -166,14 +166,20 @@ const moveEnemy = (id: string) => {
   enemy.pace = enemy.pace ?? 0
   enemy.pace++
 
-  // TODO: entity should switch to best target in its inactive sight range, tiebreaking to currently active target rather than switching
-  if (!enemy.activeTargetId) {
-    const target = Object.values(state.entities)
-      .filter(
-        (e) =>
-          targets.includes(e.type) && inactiveCoords.includes(coordToKey(e)),
-      )
-      .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))[0]
+  const possibleTargets = Object.values(state.entities)
+    .filter(
+      (e) => targets.includes(e.type) && inactiveCoords.includes(coordToKey(e)),
+    )
+    .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))
+
+  const activeTarget = state.entities[enemy.activeTargetId ?? '']
+  if (
+    !activeTarget ||
+    (possibleTargets[0] &&
+      targets.indexOf(possibleTargets[0].type) <
+        targets.indexOf(activeTarget.type))
+  ) {
+    const target = possibleTargets[0]
     if (target) enemy.activeTargetId = target.id
   }
 
