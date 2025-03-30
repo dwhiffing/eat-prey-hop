@@ -1,4 +1,10 @@
-import { ENTITY_TYPES, gridSize, INITIAL_STATE, SAVE_KEY } from '../constants'
+import {
+  ENTITY_TYPES,
+  INITIAL_STATE,
+  initialGridSize,
+  SAVE_KEY,
+  SCORE_FOR_GRID_SIZE_INCREASE,
+} from '../constants'
 import { Coord, Entity, EntityTypeKey } from '../types'
 import { state } from './state'
 
@@ -13,8 +19,8 @@ const moveEntity = (id: string, x: number, y: number) => {
   const entity = state.entities[id]
   if (!entity) return
 
-  const newX = Math.min(gridSize - 1, Math.max(0, entity.x + x))
-  const newY = Math.min(gridSize - 1, Math.max(0, entity.y + y))
+  const newX = Math.min(state.gridSize - 1, Math.max(0, entity.x + x))
+  const newY = Math.min(state.gridSize - 1, Math.max(0, entity.y + y))
   const dest = Object.values(state.entities).find((e) =>
     overlap({ x: newX, y: newY }, e),
   )
@@ -51,7 +57,10 @@ const removeEntity = (entity: Entity) => {
   if (entity.id === 'rabbit') {
     setTimeout(() => {
       const { score, highScore } = state
+      const cloned = JSON.parse(JSON.stringify(INITIAL_STATE))
       Object.assign(state, JSON.parse(JSON.stringify(INITIAL_STATE)))
+      state.nextSpawn = undefined
+      state.spawnPool = cloned.spawnPool
       state.highScore = highScore
       if (score > highScore) {
         localStorage.setItem(SAVE_KEY, `${state.highScore}`)
@@ -72,12 +81,16 @@ export const movePlayer = (dx: number, y: number) => {
   if (carrot) {
     if (overlap(state.entities.rabbit, carrot)) {
       state.score += 10 * getScoreMulti()
+      const m = 1 + (state.gridSize - initialGridSize)
+      if (state.score >= m * SCORE_FOR_GRID_SIZE_INCREASE) {
+        state.gridSize = initialGridSize + m
+      }
       removeEntity(carrot)
     }
   } else {
     const blacklist = Object.values(state.entities).map(coordToKey)
     if (state.nextSpawn) blacklist.push(coordToKey(state.nextSpawn.coords))
-    spawnEntity('carrot', getRandomPosition(gridSize, blacklist))
+    spawnEntity('carrot', getRandomPosition(state.gridSize, blacklist))
   }
 
   moveEnemies()
@@ -91,7 +104,7 @@ export const movePlayer = (dx: number, y: number) => {
       .map(coordToKey)
     state.nextSpawn = {
       key: state.spawnPool.shift()!,
-      coords: getRandomPosition(gridSize, blacklist),
+      coords: getRandomPosition(state.gridSize, blacklist),
     }
   }
   if (state.spawnPool.length === 0) {

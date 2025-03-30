@@ -1,12 +1,14 @@
 import { EntityType, EntityTypeKey } from './types'
 
-export const gridSize = 9
+export const initialGridSize = 5
 export const maxWidth = 900
+export const SCORE_FOR_GRID_SIZE_INCREASE = 100
 export const DEBUG = true
 export const SAVE_KEY = 'rabbit-game-highscore'
 export const INITIAL_STATE = {
   gameOver: true,
   score: 0,
+  gridSize: initialGridSize,
   highScore: 0,
   spawnPool: ['fox', 'wolf'] as EntityTypeKey[],
   nextSpawn: undefined,
@@ -15,14 +17,14 @@ export const INITIAL_STATE = {
     rabbit: {
       id: 'rabbit',
       type: 'rabbit' as EntityTypeKey,
-      x: Math.floor(gridSize / 2),
-      y: Math.floor(gridSize / 2),
+      x: Math.floor(initialGridSize / 2),
+      y: Math.floor(initialGridSize / 2),
     },
     carrot: {
       id: 'carrot',
       type: 'carrot' as EntityTypeKey,
-      x: Math.floor(gridSize / 2) + 1,
-      y: Math.floor(gridSize / 2),
+      x: Math.floor(initialGridSize / 2) + 1,
+      y: Math.floor(initialGridSize / 2),
     },
     // carrot0: { id: 'carrot0', type: 'carrot' as EntityTypeKey, x: 0, y: 1 },
     // carrot1: { id: 'carrot1', type: 'carrot' as EntityTypeKey, x: 1, y: 1 },

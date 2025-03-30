@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useSnapshot } from 'valtio'
-import { gridSize, maxWidth } from '../constants'
+import { maxWidth } from '../constants'
 import { useKeyboard } from '../hooks/useKeyboard'
 import { movePlayer, getScoreMulti } from '../utils'
 import { state } from '../utils/state'
@@ -22,10 +22,16 @@ export function Game() {
 
   return (
     <div className="flex flex-col gap-2 items-center justify-center w-full h-full px-8">
-      <Grid gridSize={gridSize} maxWidth={maxWidth} entities={snap.entities} />
-      <p className="text-white">Score: {snap.score}</p>
-      <p className="text-white">Multi: {getScoreMulti()}</p>
-      <p className="text-white">Spawn: {snap.spawnTimer}</p>
+      <Grid
+        gridSize={snap.gridSize}
+        maxWidth={maxWidth}
+        entities={snap.entities}
+      />
+      <div className="flex flex-row gap-5">
+        <p className="text-white">Score: {snap.score}</p>
+        <p className="text-white">Multi: {getScoreMulti()}</p>
+        <p className="text-white">Spawn: {snap.spawnTimer}</p>
+      </div>
     </div>
   )
 }
