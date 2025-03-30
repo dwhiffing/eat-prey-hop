@@ -1,5 +1,5 @@
 import { ENTITY_TYPES, gridSize } from '../constants'
-import { Coord } from '../types'
+import { Coord, Entity } from '../types'
 import { state } from './state'
 
 const overlap = (a: Coord, b: Coord) => a.x === b.x && a.y === b.y
@@ -30,31 +30,36 @@ const moveEnemies = () => {
 
 const moveEnemy = (id: string) => {
   const enemy = state.entities[id]
-  const rabbit = state.entities.rabbit
-  const entityType = ENTITY_TYPES[enemy.type]
+  const { targets, speed } = ENTITY_TYPES[enemy.type]
+  const target = Object.values(state.entities)
+    .filter((e) => targets.includes(e.type))
+    .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))[0]
+
+  if (!target) return
+
   enemy.pace = enemy.pace ?? 0
   enemy.pace++
-  if (enemy.pace === entityType.speed) {
+  if (enemy.pace === speed) {
     enemy.pace = 0
-    if (!overlap(enemy, rabbit)) {
-      const dir = getMoveDirection(enemy, rabbit, [])
-      if (dir?.change) moveEntity(id, dir.change.x, dir.change.y)
+    if (!overlap(enemy, target)) {
+      const dir = getMoveDirection(enemy, target)
+      if (dir) moveEntity(id, dir.x, dir.y)
     }
   }
 
-  if (overlap(enemy, rabbit)) {
+  if (overlap(enemy, target)) {
     setTimeout(() => {
-      delete state.entities.rabbit
+      delete state.entities[target.id]
     }, 100)
   }
 }
 
 const getMoveDirection = (
-  current: Coord,
-  target: Coord,
-  unpassable: string[],
+  current: Entity,
+  target: Entity,
   allowDiagonals = true,
 ) => {
+  if (!current || !target) return { x: 0, y: 0 }
   const coordToKey = (coord: Coord) => `${coord.x},${coord.y}`
 
   const options: { change: Coord; coord: Coord }[] = [
@@ -92,9 +97,15 @@ const getMoveDirection = (
       (Math.abs(b.coord.x - target.x) + Math.abs(b.coord.y - target.y)),
   )
 
+  const unpassable = Object.values(state.entities)
+    .filter((e) => {
+      const t = ENTITY_TYPES[current.type]
+      return !t.targets.includes(e.type)
+    })
+    .map((e) => coordToKey({ x: e.x, y: e.y }))
   for (const option of options) {
     if (!unpassable.includes(coordToKey(option.coord))) {
-      return option
+      return option.change
     }
   }
 
