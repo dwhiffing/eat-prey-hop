@@ -7,7 +7,7 @@ import { state } from '../utils/state'
 import { Grid } from './Grid'
 
 export function Game() {
-  const snap = useSnapshot(state)
+  const { gridSize, score, spawnTimer } = useSnapshot(state)
 
   useKeyboard(
     useCallback((event: KeyboardEvent) => {
@@ -22,15 +22,11 @@ export function Game() {
 
   return (
     <div className="flex flex-col gap-2 items-center justify-center w-full h-full px-8">
-      <Grid
-        gridSize={snap.gridSize}
-        maxWidth={maxWidth}
-        entities={snap.entities}
-      />
+      <Grid gridSize={gridSize} maxWidth={maxWidth} />
       <div className="flex flex-row gap-5">
-        <p className="text-white">Score: {snap.score}</p>
+        <p className="text-white">Score: {score}</p>
         <p className="text-white">Multi: {getScoreMulti()}</p>
-        <p className="text-white">Spawn: {snap.spawnTimer}</p>
+        <p className="text-white">Spawn: {spawnTimer}</p>
       </div>
     </div>
   )

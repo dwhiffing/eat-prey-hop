@@ -1,15 +1,16 @@
 import { AnimatePresence } from 'motion/react'
 import React, { useMemo } from 'react'
 import { useElementSize } from '../hooks/useElementSize'
-import { Entity } from '../types'
 import { state } from '../utils/state'
 import { Animal, IdAnimal } from './Animal'
+import { useSnapshot } from 'valtio'
 
 export const Grid: React.FC<{
   gridSize: number
   maxWidth: number
-  entities: Record<string, Entity>
-}> = ({ gridSize, maxWidth, entities }) => {
+}> = ({ gridSize, maxWidth }) => {
+  const entities = useSnapshot(state.entities)
+
   const [setRef, size] = useElementSize()
   const cellSize = size.width / gridSize
   const gridTemplateColumns = `repeat(${gridSize}, minmax(0, 1fr))`
