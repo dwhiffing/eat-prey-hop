@@ -20,6 +20,8 @@ export interface Entity {
   food?: number
   activeTargetId?: string
   nextMove?: Coord
+  line?: Coord[]
+  shouldDie?: boolean
 }
 export interface EntityType {
   image: EntityTypeKey

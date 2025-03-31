@@ -124,22 +124,23 @@ export const movePlayer = (dx: number, y: number) => {
   state.spawnTimer--
 
   if (!state.nextSpawn) {
-    const nearRabbit = getCoordsInDistance(state.entities.rabbit, 2)
+    const key = state.spawnPool.shift()!
+    const c = Math.floor(state.gridSize / 2)
+    const nearRabbit =
+      key === 'eagle'
+        ? getCoordsInDistance({ x: c, y: c }, c - 1)
+        : getCoordsInDistance(state.entities.rabbit, 2)
+
     const blacklist = [...Object.values(state.entities), ...nearRabbit]
       .filter(Boolean)
       .map(coordToKey)
-    const pos = getRandomPosition(state.gridSize, blacklist)
-    if (pos) {
-      state.nextSpawn = {
-        key: state.spawnPool.shift()!,
-        coords: pos,
-      }
-    }
+    const coords = getRandomPosition(state.gridSize, blacklist)
+    if (coords) state.nextSpawn = { key, coords }
   }
   if (state.spawnPool.length === 0) {
     // prettier-ignore
-    // 90% fox
-    state.spawnPool = shuffle(['fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'wolf'])
+    // 60% fox
+    state.spawnPool = shuffle(['fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'eagle', 'eagle', 'eagle', 'wolf'])
   }
   if (state.spawnTimer === 0 && state.nextSpawn) {
     state.spawnTimer = 10 + 1 * getScoreMulti()
@@ -211,30 +212,49 @@ const consumeEnemies = () => {
 }
 const moveEnemies = () => {
   getEnemies().forEach((enemy) => moveEnemy(enemy.id))
-  setTimeout(() => consumeEnemies(), 100)
+  consumeEnemies()
 }
 
 const moveEnemy = (id: string) => {
   const enemy = state.entities[id]
+  const rabbit = state.entities.rabbit
+
   const { targets, speed, activeSightRange, inactiveSightRange } =
     ENTITY_TYPES[enemy.type]
+  if (enemy.shouldDie) {
+    removeEntity(enemy)
+    return
+  }
+  if (enemy.type === 'eagle') {
+    if (!enemy.line) {
+      enemy.line = getLine(enemy, rabbit, state.gridSize)
+      const t = enemy.line[enemy.line.length - 1]
+      enemy.nextMove = { x: t.x - enemy.x, y: t.y - enemy.y }
+      enemy.activeTargetId = 'rabbit'
+    } else {
+      moveEntity(enemy.id, enemy.nextMove!.x, enemy.nextMove!.y)
+      if (enemy.line.some((c) => c.x === rabbit.x && c.y === rabbit.y)) {
+        removeEntity(rabbit)
+      }
+      enemy.shouldDie = true
+    }
+    return
+  }
 
   if (!targets) return
 
   enemy.pace = enemy.pace ?? 0
   enemy.pace++
-
-  const excludeBush = (e: Coord) =>
-    !Object.values(state.entities).some(
-      (b) => b.type === 'bush' && e.x === b.x && e.y == b.y,
-    )
+  const bushes = Object.values(state.entities)
+    .filter((b) => b.type === 'bush')
+    .map(coordToKey)
 
   const activeCoords = getCoordsInDistance(enemy, activeSightRange ?? 0)
-    .filter(excludeBush)
     .map(coordToKey)
+    .filter((c) => !bushes.includes(c))
   const inactiveCoords = getCoordsInDistance(enemy, inactiveSightRange ?? 0)
-    .filter(excludeBush)
     .map(coordToKey)
+    .filter((c) => !bushes.includes(c))
   // if target is hidden in bush, lose target
   const _activeTarget = state.entities[enemy.activeTargetId ?? '']
   if (
@@ -349,6 +369,25 @@ const getOuterRing = (x: number): Coord[] => {
   for (let row = x - 2; row > 0; row--) coordinates.push({ x: row, y: 0 })
 
   return coordinates
+}
+
+function getLine(start: Coord, through: Coord, gridSize: number): Coord[] {
+  const dx = through.x - start.x
+  const dy = through.y - start.y
+  const stepX = dx === 0 ? 0 : dx / Math.abs(dx)
+  const stepY = dy === 0 ? 0 : dy / Math.abs(dy)
+
+  let x = start.x,
+    y = start.y
+  const line: Coord[] = []
+
+  while (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+    line.push({ x, y })
+    x += stepX
+    y += stepY
+  }
+
+  return line
 }
 
 function pick<T>(array: T[]): T | undefined {

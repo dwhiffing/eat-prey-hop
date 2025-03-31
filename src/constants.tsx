@@ -68,6 +68,16 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isDynamic: false,
     isPlayer: false,
   },
+  eagle: {
+    image: 'eagle',
+    isDynamic: true,
+    isPlayer: false,
+    speed: 1,
+    activeSightRange: 4,
+    inactiveSightRange: 3,
+    targets: ['rabbit'],
+    passable: ['bush', 'tree', 'rock'],
+  },
   fox: {
     image: 'fox',
     isDynamic: true,
@@ -127,12 +137,5 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'bush',
     isDynamic: false,
     isPlayer: false,
-  },
-  eagle: {
-    image: 'eagle',
-    isDynamic: true,
-    isPlayer: false,
-    speed: 1,
-    targets: ['rabbit'],
   },
 }
