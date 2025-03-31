@@ -5,11 +5,11 @@ export const initialGridSize = 3
 export const maxWidth = 800
 export const MAX_ENEMIES = {
   5: 3,
-  7: 5,
-  9: 7,
-  11: 9,
+  7: 4,
+  9: 6,
+  11: 8,
 }
-export const EXPAND_POINTS = [10, 100, 500, 10000]
+export const EXPAND_POINTS = [10, 100, 1000, 10000]
 
 export const SAVE_KEY = 'eat-prey-hop-highscore'
 export const INITIAL_STATE = {

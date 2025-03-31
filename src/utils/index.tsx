@@ -183,12 +183,12 @@ export const movePlayer = (dx: number, y: number) => {
   if (state.spawnTimer === 0 && state.nextSpawn) {
     state.spawnTimer =
       state.gridSize === 11
-        ? 4
+        ? 3
         : state.gridSize === 9
-        ? 6
+        ? 5
         : state.gridSize === 7
-        ? 8
-        : 10
+        ? 10
+        : 12
 
     spawnEnemy(state.nextSpawn.key)
     if (
