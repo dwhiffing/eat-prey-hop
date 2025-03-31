@@ -27,6 +27,7 @@ const moveEntity = (id: string, x: number, y: number) => {
   const type = ENTITY_TYPES[entity.type]!
   const enemies = getEnemies()
   if (
+    entity.type !== 'eagle' &&
     dest &&
     enemies.some(
       (e) =>
@@ -34,7 +35,8 @@ const moveEntity = (id: string, x: number, y: number) => {
     )
   )
     return false
-  if (dest && !getPassable(entity, dest)) return false
+  if (entity.type !== 'eagle' && dest && !getPassable(entity, dest))
+    return false
   entity.x = newX
   entity.y = newY
   return true
