@@ -39,6 +39,17 @@ export const getScoreMulti = () => {
 
 let _id = 0
 const spawnEntity = (type: EntityTypeKey, position: Coord) => {
+  if (type === 'rock' || type === 'tree') {
+    const e = Object.values(state.entities)
+    // if we are trying to spawn a rock/tree and there is already a rock/tree adjacent to it, bail
+    if (
+      getCoordsInDistance(position, 1).some((c) => {
+        const thing = e.find((_c) => c.x === _c.x && c.y === _c.y)
+        return thing && (thing.type === 'rock' || thing.type === 'tree')
+      })
+    )
+      return
+  }
   state.entities[`${type}-${_id}`] = {
     x: position.x,
     y: position.y,
@@ -95,12 +106,10 @@ export const movePlayer = (dx: number, y: number) => {
           state.nextSpawn.coords.y += 1
         }
         getOuterRing(state.gridSize).map((c) =>
-          Math.random() > 0.33
+          Math.random() > 0.4
             ? undefined
             : spawnEntity(
                 pick([
-                  'bush',
-                  'bush',
                   'bush',
                   'bush',
                   'bush',
