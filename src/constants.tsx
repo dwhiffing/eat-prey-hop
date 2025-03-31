@@ -92,7 +92,7 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'wolf',
     isDynamic: true,
     isPlayer: false,
-    speed: 1,
+    speed: 2,
     food: 2,
     maxFood: 4,
     evolveType: 'lion',
