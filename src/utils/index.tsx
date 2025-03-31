@@ -17,16 +17,17 @@ const getPassable = (a: Entity, b: Entity) => {
 
 const moveEntity = (id: string, x: number, y: number) => {
   const entity = state.entities[id]
-  if (!entity) return
+  if (!entity) return false
 
   const newX = Math.min(state.gridSize - 1, Math.max(0, entity.x + x))
   const newY = Math.min(state.gridSize - 1, Math.max(0, entity.y + y))
   const dest = Object.values(state.entities).find((e) =>
     overlap({ x: newX, y: newY }, e),
   )
-  if (dest && !getPassable(entity, dest)) return
+  if (dest && !getPassable(entity, dest)) return false
   entity.x = newX
   entity.y = newY
+  return true
 }
 
 export const getScoreMulti = () => {
@@ -89,7 +90,9 @@ const getEntityByType = (type: EntityTypeKey) => getEntitiesByType(type)[0]
 export const movePlayer = (dx: number, y: number) => {
   if (!state.entities.rabbit) return
 
-  moveEntity('rabbit', dx, y)
+  const didMove = moveEntity('rabbit', dx, y)
+  if (!didMove) return
+
   const carrot = getEntityByType('carrot')
   if (carrot) {
     if (overlap(state.entities.rabbit, carrot)) {
