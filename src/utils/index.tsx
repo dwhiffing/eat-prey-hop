@@ -53,7 +53,9 @@ const spawnEnemy = (key: EntityTypeKey) => {
 }
 
 const removeEntity = (entity: Entity) => {
-  delete state.entities[entity.id]
+  setTimeout(() => {
+    delete state.entities[entity.id]
+  }, 0)
   if (entity.id === 'rabbit') {
     setTimeout(() => {
       const { score, highScore } = state

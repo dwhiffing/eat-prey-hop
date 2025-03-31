@@ -50,7 +50,7 @@ export const Animal = (props: {
           <AnimalRadii entity={props.entity} size={props.size} />
         )}
       </motion.div>
-      {DEBUG && <AnimalArrows entity={props.entity} size={props.size} />}
+      <AnimalArrows entity={props.entity} size={props.size} />
     </>
   )
 }
@@ -97,7 +97,7 @@ export const AnimalArrows = ({
 
   return (
     <div className="absolute inset-0 z-0">
-      {target && (
+      {target && DEBUG && (
         <Arrow start={entity} end={target} cellSize={cellSize} color="red" />
       )}
       {entity.nextMove && (
