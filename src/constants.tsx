@@ -114,7 +114,7 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'bear',
     isDynamic: true,
     isPlayer: false,
-    speed: 3,
+    speed: 4,
     food: 8,
     activeSightRange: 5,
     inactiveSightRange: 4,
