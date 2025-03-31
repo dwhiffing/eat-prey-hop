@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSnapshot } from 'valtio'
 import { maxWidth } from '../constants'
 import { useKeyboard } from '../hooks/useKeyboard'
@@ -9,6 +9,15 @@ import { Grid } from './Grid'
 export function Game() {
   // eslint-disable-next-line
   const { gridSize, score, entities } = useSnapshot(state)
+  const [, setDate] = useState(0)
+
+  const entityIdString = Object.values(entities)
+    .map((e) => e.id)
+    .join('-')
+
+  useEffect(() => {
+    setDate(Date.now())
+  }, [entityIdString])
 
   useKeyboard(
     useCallback((event: KeyboardEvent) => {
