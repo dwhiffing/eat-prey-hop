@@ -4,7 +4,7 @@ export const DEBUG = false
 export const initialGridSize = 3
 export const maxWidth = 800
 export const EXPAND_POINTS = [
-  10, 100, 250, 1000, 5000, 10000, 50000, 100000, 250000,
+  10, 100, 300, 900, 5000, 10000, 50000, 100000, 250000,
 ]
 
 export const SAVE_KEY = 'eat-prey-hop-highscore'
@@ -92,7 +92,7 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'wolf',
     isDynamic: true,
     isPlayer: false,
-    speed: 1,
+    speed: 2,
     food: 2,
     maxFood: 4,
     evolveType: 'lion',

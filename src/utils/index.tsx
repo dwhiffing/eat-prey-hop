@@ -24,6 +24,16 @@ const moveEntity = (id: string, x: number, y: number) => {
   const dest = Object.values(state.entities).find((e) =>
     overlap({ x: newX, y: newY }, e),
   )
+  const type = ENTITY_TYPES[entity.type]!
+  const enemies = getEnemies()
+  if (
+    dest &&
+    enemies.some(
+      (e) =>
+        !type.targets!.includes(e.type) && e.x === dest.x && e.y === dest.y,
+    )
+  )
+    return false
   if (dest && !getPassable(entity, dest)) return false
   entity.x = newX
   entity.y = newY
@@ -168,7 +178,7 @@ export const movePlayer = (dx: number, y: number) => {
     if (coords) state.nextSpawn = { key, coords }
   }
   if (state.spawnTimer === 0 && state.nextSpawn) {
-    state.spawnTimer = 10
+    state.spawnTimer = 12
     spawnEnemy(state.nextSpawn.key)
     state.nextSpawn = undefined
   }
@@ -236,8 +246,34 @@ const consumeEnemies = () => {
   })
 }
 const moveEnemies = () => {
-  getEnemies().forEach((enemy) => moveEnemy(enemy.id))
+  const enemies = getEnemies()
+  const targetedEnemies = enemies.filter((e) =>
+    enemies.some((_e) => _e.activeTargetId === e.id),
+  )
+  const untargetedEnemies = enemies.filter(
+    (e) => !enemies.some((_e) => _e.activeTargetId === e.id),
+  )
+  const all = [...untargetedEnemies, ...targetedEnemies]
+  all.forEach((enemy) => moveEnemy(enemy.id))
   consumeEnemies()
+  all.forEach((enemy) => {
+    // determine next move if we dont have one
+    // if we are currently a target of something, run away from that instead of toward prey
+    const predator = Object.values(state.entities).find(
+      (e) => e.activeTargetId === enemy.id,
+    )
+    const target = state.entities[enemy.activeTargetId ?? '']
+    // lose target if they are too far away
+    // if (target && !activeCoords.includes(coordToKey(target))) {
+    //   enemy.activeTargetId = undefined
+    //   enemy.nextMove = undefined
+    // }
+    if (target) {
+      enemy.nextMove = getMoveDirection(enemy, target, false)
+    } else if (predator) {
+      enemy.nextMove = getMoveDirection(enemy, predator, true)
+    }
+  })
 }
 
 const moveEnemy = (id: string) => {
@@ -299,88 +335,64 @@ const moveEnemy = (id: string) => {
     .filter(
       (e) => targets.includes(e.type) && inactiveCoords.includes(coordToKey(e)),
     )
-    .sort((a, b) => targets.indexOf(a.type) - targets.indexOf(b.type))
-  const activeTarget = state.entities[enemy.activeTargetId ?? '']
-  if (
-    !activeTarget ||
-    (possibleTargets[0] &&
-      targets.indexOf(possibleTargets[0].type) <
-        targets.indexOf(activeTarget.type))
-  ) {
-    const target = possibleTargets[0]
-    if (target) enemy.activeTargetId = target.id
-  }
-
-  // lose target if they are too far away
-  const target = state.entities[enemy.activeTargetId ?? '']
-  if (target && !activeCoords.includes(coordToKey(target))) {
-    enemy.activeTargetId = undefined
-    enemy.nextMove = undefined
-  }
+    .sort(
+      (a, b) =>
+        (targets.indexOf(a.type) - targets.indexOf(b.type)) * 100 +
+        (getDistance(enemy.x, enemy.y, a.x, a.y) -
+          getDistance(enemy.x, enemy.y, b.x, b.y)),
+    )
+  if (possibleTargets[0]) enemy.activeTargetId = possibleTargets[0].id
 
   // if we are ready to move and we have somewhere to move, move
   if (enemy.pace >= (speed ?? 0)) {
     if (enemy.nextMove) moveEntity(id, enemy.nextMove.x, enemy.nextMove.y)
-    enemy.nextMove = undefined
+    // enemy.nextMove = undefined
     enemy.pace = 0
-  }
-
-  if (!enemy.nextMove) {
-    // determine next move if we dont have one
-    // if we are currently a target of something, run away from that instead of toward prey
-    const predator = Object.values(state.entities).find(
-      (e) => e.activeTargetId === id,
-    )
-    if (predator) {
-      enemy.nextMove = getMoveDirection(enemy, predator, true, true)
-    } else if (target && !overlap(enemy, target)) {
-      enemy.nextMove = getMoveDirection(enemy, target, true, false)
-    }
   }
 }
 
 const coordToKey = (coord: Partial<Coord>) => `${coord.x},${coord.y}`
-const getMoveDirection = (
-  src: Entity,
-  dest: Entity,
-  allowDiagonals = true,
-  invert = false,
-) => {
+const getMoveDirection = (src: Entity, dest: Entity, invert = false) => {
   if (!src || !dest) return { x: 0, y: 0 }
 
-  let options: { change: Coord; coord: Coord }[] = [
+  let options: { change: Coord; coord: Coord }[] = []
+
+  options.push(
+    { change: { x: 1, y: 1 }, coord: { x: src.x + 1, y: src.y + 1 } },
+    { change: { x: 1, y: -1 }, coord: { x: src.x + 1, y: src.y - 1 } },
+    { change: { x: -1, y: 1 }, coord: { x: src.x - 1, y: src.y + 1 } },
+    { change: { x: -1, y: -1 }, coord: { x: src.x - 1, y: src.y - 1 } },
+  )
+
+  options.push(
     { change: { x: 1, y: 0 }, coord: { x: src.x + 1, y: src.y } },
     { change: { x: -1, y: 0 }, coord: { x: src.x - 1, y: src.y } },
     { change: { x: 0, y: 1 }, coord: { x: src.x, y: src.y + 1 } },
     { change: { x: 0, y: -1 }, coord: { x: src.x, y: src.y - 1 } },
-  ]
-
-  if (allowDiagonals) {
-    options.push(
-      { change: { x: 1, y: 1 }, coord: { x: src.x + 1, y: src.y + 1 } },
-      { change: { x: 1, y: -1 }, coord: { x: src.x + 1, y: src.y - 1 } },
-      { change: { x: -1, y: 1 }, coord: { x: src.x - 1, y: src.y + 1 } },
-      { change: { x: -1, y: -1 }, coord: { x: src.x - 1, y: src.y - 1 } },
-    )
-  }
+  )
 
   const unpassable = Object.values(state.entities)
     .filter((e) => !getPassable(src, e))
     .map(coordToKey)
+  if (state.nextSpawn) unpassable.push(coordToKey(state.nextSpawn.coords))
+
   options = options
     .filter((o) => !unpassable.includes(coordToKey(o.coord)))
     .filter(
       ({ coord: b }) =>
         b.x >= 0 && b.y >= 0 && b.x < state.gridSize && b.y < state.gridSize,
     )
+    .map((o) => {
+      const score = Math.sqrt(
+        (o.coord.x - dest.x) ** 2 + (o.coord.y - dest.y) ** 2,
+      )
+      return { ...o, score }
+    })
     .sort((_a, _b) => {
       const a = invert ? _b : _a
       const b = invert ? _a : _b
-      return (
-        Math.abs(a.coord.x - dest.x) +
-        Math.abs(a.coord.y - dest.y) -
-        (Math.abs(b.coord.x - dest.x) + Math.abs(b.coord.y - dest.y))
-      )
+
+      return a.score - b.score
     })
 
   return options[0]?.change ?? { x: 0, y: 0 }
@@ -422,25 +434,6 @@ function pick<T>(array: T[]): T | undefined {
   return array[Math.floor(Math.random() * array.length)]
 }
 
-function shuffle<T>(array: T[]): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
+const getDistance = (x1: number, y1: number, x2: number, y2: number) => {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 }
-
-// function getCoordsInRadius(center: Coord, radius: number): Coord[] {
-//   const coords: Coord[] = []
-
-//   for (let dx = -radius; dx <= radius; dx++) {
-//     for (let dy = -radius; dy <= radius; dy++) {
-//       if (dx * dx + dy * dy <= radius * radius) {
-//         coords.push({ x: center.x + dx, y: center.y + dy })
-//       }
-//     }
-//   }
-
-//   return coords
-// }
