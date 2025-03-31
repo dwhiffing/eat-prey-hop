@@ -76,7 +76,7 @@ const spawnEnemy = (key: EntityTypeKey) => {
   if (state.nextSpawn) spawnEntity(key, state.nextSpawn.coords)
 }
 
-const removeEntity = (entity: Entity) => {
+export const removeEntity = (entity: Entity) => {
   setTimeout(() => {
     delete state.entities[entity.id]
   }, 0)

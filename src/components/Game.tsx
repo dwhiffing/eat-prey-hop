@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSnapshot } from 'valtio'
 import { maxWidth } from '../constants'
 import { useKeyboard } from '../hooks/useKeyboard'
-import { movePlayer, getScoreMulti } from '../utils'
+import { movePlayer, getScoreMulti, removeEntity } from '../utils'
 import { state } from '../utils/state'
 import { Grid } from './Grid'
 
@@ -27,6 +27,7 @@ export function Game() {
       if (event.key === 'ArrowLeft') movePlayer(-1, 0)
       if (event.key === 'ArrowUp') movePlayer(0, -1)
       if (event.key === 'ArrowDown') movePlayer(0, 1)
+      if (event.key === 'r') removeEntity(state.entities.rabbit)
     }, []),
   )
 
