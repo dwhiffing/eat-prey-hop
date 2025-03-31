@@ -168,7 +168,7 @@ export const movePlayer = (dx: number, y: number) => {
     if (coords) state.nextSpawn = { key, coords }
   }
   if (state.spawnTimer === 0 && state.nextSpawn) {
-    state.spawnTimer = 10
+    state.spawnTimer = 12
     spawnEnemy(state.nextSpawn.key)
     state.nextSpawn = undefined
   }
