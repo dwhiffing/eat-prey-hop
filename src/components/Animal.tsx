@@ -36,7 +36,6 @@ export const Animal = (props: {
   const opacity = props.opacity
   const startOpacity = opacity !== 0.5 ? 0.5 : 0
   const eatPercent = (props.entity.food ?? 0) / (maxFood ?? 1)
-  console.log({ timer: props.timer })
 
   return (
     <>
@@ -130,7 +129,9 @@ export const AnimalArrows = ({
             x: entity.x + entity.nextMove.x,
             y: entity.y + entity.nextMove.y,
           }}
-          color={entity.pace === (speed ?? 0) - 1 ? 'white' : '#ffffff44'}
+          color={
+            (entity.pace ?? 0) === (speed ?? 0) - 1 ? 'white' : '#ffffff44'
+          }
         />
       )}
     </div>

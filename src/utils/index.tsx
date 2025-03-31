@@ -255,6 +255,8 @@ const moveEnemy = (id: string) => {
         removeEntity(rabbit)
       }
       enemy.shouldDie = true
+      enemy.line = undefined
+      enemy.nextMove = undefined
     }
     return
   }
