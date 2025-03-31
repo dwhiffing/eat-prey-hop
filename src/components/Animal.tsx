@@ -45,7 +45,7 @@ export const Animal = (props: {
         initial={{ x, y, opacity: startOpacity }}
         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
       >
-        <img src={`/${image}.png`} style={{ width: props.size * 0.8 }} />
+        <img src={`${image}.png`} style={{ width: props.size * 0.8 }} />
         {opacity === 1 && DEBUG && (
           <AnimalRadii entity={props.entity} size={props.size} />
         )}

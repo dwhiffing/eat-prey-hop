@@ -30,10 +30,10 @@ const moveEntity = (id: string, x: number, y: number) => {
 }
 
 export const getScoreMulti = () => {
-  const bears = getEntitiesByType('bear').length * 16
-  const lions = getEntitiesByType('lion').length * 8
-  const wolves = getEntitiesByType('wolf').length * 4
-  const foxes = Math.max(getEntitiesByType('fox').length * 2, 1)
+  const bears = getEntitiesByType('bear').length * 8
+  const lions = getEntitiesByType('lion').length * 4
+  const wolves = getEntitiesByType('wolf').length * 2
+  const foxes = Math.max(getEntitiesByType('fox').length, 1)
   return bears + lions + wolves + foxes
 }
 
