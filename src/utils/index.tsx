@@ -69,15 +69,15 @@ const removeEntity = (entity: Entity) => {
     delete state.entities[entity.id]
   }, 0)
   if (entity.id === 'rabbit') {
+    const { score, highScore } = state
     setTimeout(() => {
-      const { score, highScore } = state
       const cloned = JSON.parse(JSON.stringify(INITIAL_STATE))
       Object.assign(state, JSON.parse(JSON.stringify(INITIAL_STATE)))
       state.nextSpawn = undefined
       state.spawnPool = cloned.spawnPool
-      state.highScore = highScore
       if (score > highScore) {
-        localStorage.setItem(SAVE_KEY, `${state.highScore}`)
+        state.highScore = score
+        localStorage.setItem(SAVE_KEY, `${score}`)
       }
     }, 1000)
   }
