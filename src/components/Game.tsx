@@ -12,6 +12,7 @@ export function Game() {
   useKeyboard(
     useCallback((event: KeyboardEvent) => {
       if (event.repeat) return
+      event.preventDefault()
       if (event.key === 'ArrowRight') movePlayer(1, 0)
       if (event.key === 'ArrowLeft') movePlayer(-1, 0)
       if (event.key === 'ArrowUp') movePlayer(0, -1)
