@@ -34,8 +34,8 @@ export const getScoreMulti = () => {
   const bears = getEntitiesByType('bear').length * 8
   const lions = getEntitiesByType('lion').length * 4
   const wolves = getEntitiesByType('wolf').length * 2
-  const foxes = Math.max(getEntitiesByType('fox').length, 1)
-  return bears + lions + wolves + foxes
+  const foxes = getEntitiesByType('fox').length
+  return 1 + bears + lions + wolves + foxes
 }
 
 let _id = 0
@@ -96,7 +96,9 @@ export const movePlayer = (dx: number, y: number) => {
   const carrot = getEntityByType('carrot')
   if (carrot) {
     if (overlap(state.entities.rabbit, carrot)) {
-      state.score += 10 * getScoreMulti()
+      const score = 10 * getScoreMulti()
+      state.lastScore = `${score}-${Date.now()}`
+      state.score += score
       const m = 1 + (state.gridSize - initialGridSize) / 2
       if (state.score >= EXPAND_POINTS[m - 1] && state.gridSize < 17) {
         state.gridSize = initialGridSize + m * 2

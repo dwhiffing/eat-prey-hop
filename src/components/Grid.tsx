@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { AnimatePresence } from 'motion/react'
 import React, { useMemo } from 'react'
 import { useElementSize } from '../hooks/useElementSize'
@@ -10,6 +11,7 @@ export const Grid: React.FC<{
   maxWidth: number
 }> = ({ gridSize, maxWidth }) => {
   const entities = useSnapshot(state.entities)
+  const { lastScore: lastScoreString } = useSnapshot(state)
 
   const [setRef, size] = useElementSize()
   const cellSize = size.width / gridSize
@@ -19,6 +21,7 @@ export const Grid: React.FC<{
     () => (cellSize > 0 ? Object.keys(entities) : []),
     [cellSize, entities],
   )
+  const lastScore = +lastScoreString.split('-')[0]
 
   return (
     <div
@@ -51,6 +54,26 @@ export const Grid: React.FC<{
           />
         ))}
       </AnimatePresence>
+      <div className="absolute inset-0 flex justify-center items-center z-30">
+        {lastScore > 0 && (
+          <motion.div
+            key={lastScoreString}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 0, y: -30 }}
+            transition={{ duration: 2, ease: 'easeOut' }}
+          >
+            <p
+              className="text-white font-extrabold text-3xl"
+              style={{
+                textShadow:
+                  '2px 2px 0 #000, -2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000',
+              }}
+            >
+              +{lastScore}
+            </p>
+          </motion.div>
+        )}
+      </div>
     </div>
   )
 }
