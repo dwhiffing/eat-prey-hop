@@ -12,7 +12,6 @@ export const INITIAL_STATE = {
   gameOver: true,
   score: 0,
   gridSize: initialGridSize,
-  highScore: 0,
   lastScore: '0-0',
   spawnPool: ['fox', 'wolf'] as EntityTypeKey[],
   nextSpawn: undefined,

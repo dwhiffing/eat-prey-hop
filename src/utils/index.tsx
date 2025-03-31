@@ -72,7 +72,7 @@ const removeEntity = (entity: Entity) => {
     const { score, highScore } = state
     setTimeout(() => {
       const cloned = JSON.parse(JSON.stringify(INITIAL_STATE))
-      Object.assign(state, JSON.parse(JSON.stringify(INITIAL_STATE)))
+      Object.assign(state, cloned)
       state.nextSpawn = undefined
       state.spawnPool = cloned.spawnPool
       if (score > highScore) {
@@ -376,7 +376,7 @@ const getMoveDirection = (
       )
     })
 
-  return options[0].change
+  return options[0]?.change ?? { x: 0, y: 0 }
 }
 
 const getOuterRing = (x: number): Coord[] => {
