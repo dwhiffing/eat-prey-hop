@@ -30,10 +30,11 @@ export const Grid: React.FC<{
         <div key={i} className="aspect-square bg-green-500 rounded-lg" />
       ))}
       <AnimatePresence>
-        {state.nextSpawn && state.spawnTimer <= 3 && (
+        {state.nextSpawn && state.spawnTimer <= 5 && (
           <Animal
             size={cellSize}
             opacity={0.5}
+            timer={state.spawnTimer}
             entity={{
               type: state.nextSpawn.key,
               ...state.nextSpawn.coords,

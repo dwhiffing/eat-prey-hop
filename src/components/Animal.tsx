@@ -28,12 +28,13 @@ export const Animal = (props: {
   size: number
   entity: Entity
   opacity: number
+  timer?: number
 }) => {
-  const { image, isDynamic, isPlayer } = ENTITY_TYPES[props.entity.type]
+  const { image } = ENTITY_TYPES[props.entity.type]
   const x = props.entity.x * props.size
   const y = props.entity.y * props.size
   const opacity = props.opacity
-  const startOpacity = isDynamic && !isPlayer && opacity !== 0.5 ? 0.5 : 0
+  const startOpacity = opacity !== 0.5 ? 0.5 : 0
 
   return (
     <>
@@ -41,13 +42,23 @@ export const Animal = (props: {
         className="absolute flex justify-center items-center z-10"
         style={{ width: props.size, height: props.size }}
         exit={{ opacity: 0 }}
-        animate={{ x, y, opacity }}
-        initial={{ x, y, opacity: startOpacity }}
+        animate={{ x, y, opacity: 1 }}
+        initial={{ x, y, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
       >
-        <img src={`${image}.png`} style={{ width: props.size * 0.8 }} />
+        <motion.img
+          src={`${image}.png`}
+          style={{ width: props.size * 0.8 }}
+          animate={{ opacity }}
+          initial={{ opacity: startOpacity }}
+        />
         {opacity === 1 && DEBUG && (
           <AnimalRadii entity={props.entity} size={props.size} />
+        )}
+        {props.timer && (
+          <div className="absolute text-white font-bold text-xl">
+            <p>{props.timer}</p>
+          </div>
         )}
       </motion.div>
       <AnimalArrows entity={props.entity} size={props.size} />
