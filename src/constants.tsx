@@ -3,7 +3,13 @@ import { EntityType, EntityTypeKey } from './types'
 export const DEBUG = false
 export const initialGridSize = 3
 export const maxWidth = 800
-export const EXPAND_POINTS = [10, 100, 500, 5000, 15000]
+export const MAX_ENEMIES = {
+  5: 3,
+  7: 5,
+  9: 7,
+  11: 9,
+}
+export const EXPAND_POINTS = [10, 100, 500, 10000]
 
 export const SAVE_KEY = 'eat-prey-hop-highscore'
 export const INITIAL_STATE = {

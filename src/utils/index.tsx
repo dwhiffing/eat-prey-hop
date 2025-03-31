@@ -3,6 +3,7 @@ import {
   EXPAND_POINTS,
   INITIAL_STATE,
   initialGridSize,
+  MAX_ENEMIES,
   SAVE_KEY,
 } from '../constants'
 import { Coord, Entity, EntityTypeKey } from '../types'
@@ -109,8 +110,8 @@ const getSpawnKey = (): EntityTypeKey => {
   if (foxCount === 0) return 'fox'
   if (wolfCount === 0) return 'wolf'
   if (lionCount > 0 && wolfCount === 1) return 'wolf'
-  const totalCells = state.gridSize * state.gridSize
-  if (enemies.length / totalCells > 0.1) return 'eagle'
+  if (enemies.length > MAX_ENEMIES[state.gridSize as 5 | 7 | 9 | 11])
+    return 'eagle'
   return 'fox'
 }
 
@@ -180,7 +181,15 @@ export const movePlayer = (dx: number, y: number) => {
     if (coords) state.nextSpawn = { key, coords }
   }
   if (state.spawnTimer === 0 && state.nextSpawn) {
-    state.spawnTimer = 12
+    state.spawnTimer =
+      state.gridSize === 11
+        ? 4
+        : state.gridSize === 9
+        ? 6
+        : state.gridSize === 7
+        ? 8
+        : 10
+
     spawnEnemy(state.nextSpawn.key)
     if (
       state.nextSpawn.coords.x === state.entities.rabbit.x &&
