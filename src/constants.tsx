@@ -2,7 +2,7 @@ import { EntityType, EntityTypeKey } from './types'
 
 export const DEBUG = false
 export const initialGridSize = 3
-export const maxWidth = 900
+export const maxWidth = 800
 export const EXPAND_POINTS = [
   10, 100, 250, 500, 1000, 5000, 10000, 50000, 100000,
 ]
@@ -13,6 +13,7 @@ export const INITIAL_STATE = {
   score: 0,
   gridSize: initialGridSize,
   highScore: 0,
+  lastScore: '0-0',
   spawnPool: ['fox', 'wolf'] as EntityTypeKey[],
   nextSpawn: undefined,
   spawnTimer: 10,

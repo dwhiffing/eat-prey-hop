@@ -11,7 +11,11 @@ export const Grid: React.FC<{
   maxWidth: number
 }> = ({ gridSize, maxWidth }) => {
   const entities = useSnapshot(state.entities)
-  const { lastScore: lastScoreString } = useSnapshot(state)
+  const {
+    lastScore: lastScoreString,
+    nextSpawn,
+    spawnTimer,
+  } = useSnapshot(state)
 
   const [setRef, size] = useElementSize()
   const cellSize = size.width / gridSize
@@ -33,14 +37,14 @@ export const Grid: React.FC<{
         <div key={i} className="aspect-square bg-green-500 rounded-lg" />
       ))}
       <AnimatePresence>
-        {state.nextSpawn && state.spawnTimer <= 5 && (
+        {nextSpawn && spawnTimer <= 5 && (
           <Animal
             size={cellSize}
             opacity={0.5}
-            timer={state.spawnTimer}
+            timer={spawnTimer}
             entity={{
-              type: state.nextSpawn.key,
-              ...state.nextSpawn.coords,
+              type: nextSpawn.key,
+              ...nextSpawn.coords,
               id: '',
             }}
           />
@@ -60,7 +64,7 @@ export const Grid: React.FC<{
             key={lastScoreString}
             initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 0, y: -30 }}
-            transition={{ duration: 2, ease: 'easeOut' }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             <p
               className="text-white font-extrabold text-3xl"

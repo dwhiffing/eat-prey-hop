@@ -14,7 +14,6 @@ export const state = proxy<{
   entities: Record<string, Entity>
 }>({
   ...JSON.parse(JSON.stringify(INITIAL_STATE)),
-  lastScore: '0',
   gameOver: DEBUG ? false : true,
   highScore: +(localStorage.getItem(SAVE_KEY) ?? '0'),
 })

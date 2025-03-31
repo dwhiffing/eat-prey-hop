@@ -7,7 +7,7 @@ import { state } from '../utils/state'
 import { Grid } from './Grid'
 
 export function Game() {
-  const { gridSize, score, spawnTimer } = useSnapshot(state)
+  const { gridSize, score } = useSnapshot(state)
 
   useKeyboard(
     useCallback((event: KeyboardEvent) => {
@@ -25,7 +25,6 @@ export function Game() {
       <div className="flex flex-row gap-5">
         <p className="text-white">Score: {score}</p>
         <p className="text-white">Multi: {getScoreMulti()}</p>
-        <p className="text-white">Spawn: {spawnTimer}</p>
       </div>
       <div className="flex flex-col items-center gap-1">
         <MoveButton label="^" onClick={() => movePlayer(0, -1)} />

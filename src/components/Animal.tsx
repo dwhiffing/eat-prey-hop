@@ -30,11 +30,13 @@ export const Animal = (props: {
   opacity: number
   timer?: number
 }) => {
-  const { image } = ENTITY_TYPES[props.entity.type]
+  const { image, maxFood } = ENTITY_TYPES[props.entity.type]
   const x = props.entity.x * props.size
   const y = props.entity.y * props.size
   const opacity = props.opacity
   const startOpacity = opacity !== 0.5 ? 0.5 : 0
+  const eatPercent = (props.entity.food ?? 0) / (maxFood ?? 1)
+  console.log({ timer: props.timer })
 
   return (
     <>
@@ -48,7 +50,7 @@ export const Animal = (props: {
       >
         <motion.img
           src={`${image}.png`}
-          style={{ width: props.size * 0.8 }}
+          style={{ width: props.size * 0.75 }}
           animate={{ opacity }}
           initial={{ opacity: startOpacity }}
         />
@@ -58,6 +60,15 @@ export const Animal = (props: {
         {props.timer && (
           <div className="absolute text-white font-bold text-xl">
             <p>{props.timer}</p>
+          </div>
+        )}
+        {['wolf', 'lion', 'bear'].includes(props.entity.type) && (
+          <div className="absolute inset-x-[4%] bottom-[4%] h-[8%]">
+            <div className="absolute w-full h-full bg-[#fff5]" />
+            <div
+              className="absolute h-full bg-white"
+              style={{ width: `${eatPercent * 100}%` }}
+            />
           </div>
         )}
       </motion.div>

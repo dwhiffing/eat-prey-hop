@@ -90,8 +90,10 @@ const getEntityByType = (type: EntityTypeKey) => getEntitiesByType(type)[0]
 export const movePlayer = (dx: number, y: number) => {
   if (!state.entities.rabbit) return
 
-  const didMove = moveEntity('rabbit', dx, y)
-  if (!didMove) return
+  moveEntity('rabbit', dx, y)
+  // Restore this to disable waiting move
+  // const didMove = moveEntity('rabbit', dx, y)
+  // if (!didMove) return
 
   const carrot = getEntityByType('carrot')
   if (carrot) {
@@ -119,7 +121,7 @@ export const movePlayer = (dx: number, y: number) => {
                   'bush',
                   'bush',
                   'bush',
-                  'tree',
+                  // 'tree',
                   'rock',
                 ]) as EntityTypeKey,
                 c,
