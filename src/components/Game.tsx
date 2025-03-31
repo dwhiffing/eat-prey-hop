@@ -7,7 +7,8 @@ import { state } from '../utils/state'
 import { Grid } from './Grid'
 
 export function Game() {
-  const { gridSize, score } = useSnapshot(state)
+  // eslint-disable-next-line
+  const { gridSize, score, entities } = useSnapshot(state)
 
   useKeyboard(
     useCallback((event: KeyboardEvent) => {

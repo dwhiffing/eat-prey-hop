@@ -67,7 +67,7 @@ export const Animal = (props: {
             <p>{props.timer}</p>
           </div>
         )}
-        {['wolf', 'lion', 'bear'].includes(props.entity.type) && (
+        {['wolf', 'lion'].includes(props.entity.type) && (
           <div className="absolute inset-x-[4%] bottom-[4%] h-[8%]">
             <div className="absolute w-full h-full bg-[#fff5]" />
             <div
