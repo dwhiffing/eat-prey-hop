@@ -170,6 +170,12 @@ export const movePlayer = (dx: number, y: number) => {
   if (state.spawnTimer === 0 && state.nextSpawn) {
     state.spawnTimer = 12
     spawnEnemy(state.nextSpawn.key)
+    if (
+      state.nextSpawn.coords.x === state.entities.rabbit.x &&
+      state.nextSpawn.coords.y === state.entities.rabbit.y
+    ) {
+      removeEntity(state.entities.rabbit)
+    }
     state.nextSpawn = undefined
   }
 }
