@@ -108,7 +108,7 @@ export const AnimalArrows = ({
             x: entity.x + entity.nextMove.x,
             y: entity.y + entity.nextMove.y,
           }}
-          color={entity.pace === (speed ?? 0) - 1 ? 'white' : 'gray'}
+          color={entity.pace === (speed ?? 0) - 1 ? 'white' : '#ffffff44'}
         />
       )}
     </div>
@@ -159,7 +159,7 @@ const Arrow: React.FC<{
       <line
         x1="0"
         y1="0"
-        x2={distance - 5}
+        x2={distance - size}
         y2="0"
         stroke={color}
         strokeWidth="2"
