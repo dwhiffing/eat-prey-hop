@@ -40,6 +40,7 @@ export const Animal = (props: {
   return (
     <>
       <motion.div
+        key={props.entity.id}
         className={`absolute flex justify-center items-center ${
           props.entity.type === 'eagle'
             ? 'z-40'
@@ -47,9 +48,13 @@ export const Animal = (props: {
             ? 'z-30'
             : 'z-10'
         }`}
-        style={{ width: props.size, height: props.size }}
+        style={
+          opacity === 0.5
+            ? { x, y, width: props.size, height: props.size }
+            : { width: props.size, height: props.size }
+        }
         exit={{ opacity: 0 }}
-        animate={{ x, y, opacity: 1 }}
+        animate={opacity === 0.5 ? { opacity: 1 } : { x, y, opacity: 1 }}
         initial={{ x, y, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
       >
