@@ -24,6 +24,16 @@ const moveEntity = (id: string, x: number, y: number) => {
   const dest = Object.values(state.entities).find((e) =>
     overlap({ x: newX, y: newY }, e),
   )
+  const type = ENTITY_TYPES[entity.type]!
+  const enemies = getEnemies()
+  if (
+    dest &&
+    enemies.some(
+      (e) =>
+        !type.targets!.includes(e.type) && e.x === dest.x && e.y === dest.y,
+    )
+  )
+    return false
   if (dest && !getPassable(entity, dest)) return false
   entity.x = newX
   entity.y = newY
