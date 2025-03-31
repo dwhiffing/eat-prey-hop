@@ -2,4 +2,5 @@
 
 body {
   @apply bg-[#33803F];
+  touch-action: manipulation;
 }
