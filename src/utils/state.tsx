@@ -10,7 +10,6 @@ export const state = proxy<{
   lastScore: string
   spawnTimer: number
   nextSpawn?: { key: EntityTypeKey; coords: Coord }
-  spawnPool: EntityTypeKey[]
   entities: Record<string, Entity>
 }>({
   ...JSON.parse(JSON.stringify(INITIAL_STATE)),

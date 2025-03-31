@@ -74,7 +74,6 @@ const removeEntity = (entity: Entity) => {
       const cloned = JSON.parse(JSON.stringify(INITIAL_STATE))
       Object.assign(state, cloned)
       state.nextSpawn = undefined
-      state.spawnPool = cloned.spawnPool
       if (score > highScore) {
         state.highScore = score
         localStorage.setItem(SAVE_KEY, `${score}`)
@@ -86,6 +85,22 @@ const removeEntity = (entity: Entity) => {
 const getEntitiesByType = (type: EntityTypeKey) =>
   Object.values(state.entities).filter((s) => s.type === type)
 const getEntityByType = (type: EntityTypeKey) => getEntitiesByType(type)[0]
+
+const getSpawnKey = (): EntityTypeKey => {
+  const enemies = getEnemies()
+  const foxCount = enemies.filter((e) => e.type === 'fox').length
+  const wolfCount = enemies.filter((e) => e.type === 'wolf').length
+  const lionCount = enemies.filter(
+    (e) => e.type === 'lion' || e.type === 'bear',
+  ).length
+
+  if (foxCount === 0) return 'fox'
+  if (wolfCount === 0) return 'wolf'
+  if (lionCount > 0 && wolfCount === 1) return 'wolf'
+  const totalCells = state.gridSize * state.gridSize
+  if (enemies.length / totalCells > 0.1) return 'eagle'
+  return 'fox'
+}
 
 export const movePlayer = (dx: number, y: number) => {
   if (!state.entities.rabbit) return
@@ -113,13 +128,10 @@ export const movePlayer = (dx: number, y: number) => {
           state.nextSpawn.coords.y += 1
         }
         getOuterRing(state.gridSize).map((c) =>
-          Math.random() > 0.4
+          Math.random() > 0.35
             ? undefined
             : spawnEntity(
                 pick([
-                  'bush',
-                  'bush',
-                  'bush',
                   'bush',
                   // 'tree',
                   'rock',
@@ -142,7 +154,7 @@ export const movePlayer = (dx: number, y: number) => {
   state.spawnTimer--
 
   if (!state.nextSpawn) {
-    const key = state.spawnPool.shift()!
+    const key = getSpawnKey()
     const c = Math.floor(state.gridSize / 2)
     const nearRabbit =
       key === 'eagle'
@@ -155,13 +167,8 @@ export const movePlayer = (dx: number, y: number) => {
     const coords = getRandomPosition(state.gridSize, blacklist)
     if (coords) state.nextSpawn = { key, coords }
   }
-  if (state.spawnPool.length === 0) {
-    // prettier-ignore
-    // 60% fox
-    state.spawnPool = shuffle(['fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'fox', 'eagle', 'eagle', 'eagle', 'wolf'])
-  }
   if (state.spawnTimer === 0 && state.nextSpawn) {
-    state.spawnTimer = 10 + 1 * getScoreMulti()
+    state.spawnTimer = 10
     spawnEnemy(state.nextSpawn.key)
     state.nextSpawn = undefined
   }

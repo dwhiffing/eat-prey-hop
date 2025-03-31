@@ -4,7 +4,7 @@ export const DEBUG = false
 export const initialGridSize = 3
 export const maxWidth = 800
 export const EXPAND_POINTS = [
-  10, 100, 250, 500, 1000, 5000, 10000, 50000, 100000,
+  10, 100, 250, 1000, 5000, 10000, 50000, 100000, 250000,
 ]
 
 export const SAVE_KEY = 'eat-prey-hop-highscore'
@@ -13,7 +13,6 @@ export const INITIAL_STATE = {
   score: 0,
   gridSize: initialGridSize,
   lastScore: '0-0',
-  spawnPool: ['fox', 'wolf'] as EntityTypeKey[],
   nextSpawn: undefined,
   spawnTimer: 10,
   entities: {
@@ -84,8 +83,8 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     isPlayer: false,
     speed: 2,
     food: 1,
-    activeSightRange: 4,
-    inactiveSightRange: 2,
+    activeSightRange: 5,
+    inactiveSightRange: 4,
     targets: ['rabbit'],
     passable: ['bush'],
   },
@@ -93,11 +92,11 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'wolf',
     isDynamic: true,
     isPlayer: false,
-    speed: 3,
-    activeSightRange: 4,
+    speed: 1,
     food: 2,
     maxFood: 4,
     evolveType: 'lion',
+    activeSightRange: 4,
     inactiveSightRange: 3,
     targets: ['fox', 'rabbit'],
   },
@@ -105,9 +104,9 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'lion',
     isDynamic: true,
     isPlayer: false,
-    speed: 5,
+    speed: 2,
     food: 4,
-    maxFood: 16,
+    maxFood: 8,
     evolveType: 'bear',
     activeSightRange: 3,
     inactiveSightRange: 3,
@@ -117,7 +116,7 @@ export const ENTITY_TYPES: Record<string, EntityType> = {
     image: 'bear',
     isDynamic: true,
     isPlayer: false,
-    speed: 7,
+    speed: 3,
     food: 8,
     activeSightRange: 3,
     inactiveSightRange: 2,

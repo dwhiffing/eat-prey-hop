@@ -40,7 +40,13 @@ export const Animal = (props: {
   return (
     <>
       <motion.div
-        className="absolute flex justify-center items-center z-10"
+        className={`absolute flex justify-center items-center ${
+          props.entity.type === 'eagle'
+            ? 'z-40'
+            : props.entity.type === 'bush'
+            ? 'z-30'
+            : 'z-10'
+        }`}
         style={{ width: props.size, height: props.size }}
         exit={{ opacity: 0 }}
         animate={{ x, y, opacity: 1 }}
@@ -118,9 +124,6 @@ export const AnimalArrows = ({
 
   return (
     <div className="absolute inset-0 z-0">
-      {target && DEBUG && (
-        <Arrow start={entity} end={target} cellSize={cellSize} color="red" />
-      )}
       {entity.nextMove && (
         <Arrow
           start={entity}
@@ -129,10 +132,11 @@ export const AnimalArrows = ({
             x: entity.x + entity.nextMove.x,
             y: entity.y + entity.nextMove.y,
           }}
-          color={
-            (entity.pace ?? 0) === (speed ?? 0) - 1 ? 'white' : '#ffffff44'
-          }
+          color={(entity.pace ?? 0) >= (speed ?? 0) - 1 ? 'white' : '#ffffff44'}
         />
+      )}
+      {target && DEBUG && (
+        <Arrow start={entity} end={target} cellSize={cellSize} color="red" />
       )}
     </div>
   )
